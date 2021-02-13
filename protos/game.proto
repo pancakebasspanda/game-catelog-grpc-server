@@ -1,0 +1,52 @@
+syntax = 'proto3';
+
+package protos;
+
+service GameCatalogService {
+    rpc InStock (InStockRequest) returns (InStockResponse);
+    rpc Search (SearchRequest) returns (SearchResponse);
+  }
+
+enum Format {
+    PS4 = 0;
+    XBOX = 1;
+    NINTENDO_SWITCH = 2;
+    PC = 3;
+}
+
+enum Genre {
+    ACTION = 0;
+    ADVENTURE = 1;
+    SPORT = 3;
+    RPG = 4;
+}
+
+message Game {
+    enum NoOfPlayers {
+        ONE_PLAYER = 0;
+        TWO_PLAYER = 1;
+    }
+
+    string title = 1;
+    Format format = 2;
+    float price = 3;
+    Genre genre = 4;
+    NoOfPlayers players = 5;
+}
+
+message InStockRequest {
+    string title = 1;
+}
+
+message InStockResponse {
+    bool stock = 1;
+}
+
+message SearchRequest {
+    Format format = 1;
+    float price = 2;
+}
+
+message SearchResponse {
+    repeated Game games = 1;
+}

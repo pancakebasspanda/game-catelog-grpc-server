@@ -1,0 +1,19 @@
+stages:
+- build
+
+image: golang:1.13
+Fmt Vet Test Build:
+  stage: build
+  tags:
+    - us-operations
+  script:
+    - go fmt $(go list ./... | grep -v '/vendor/') | awk '{print "Please run go fmt"; exit 1 }'
+    - go vet $(go list ./... | grep -v '/vendor/') | awk '{print "Please run go vet"; exit 1 }'
+    - go test $(go list ./... | grep -v /vendor/ | grep -v /cmd/) -race -coverprofile=fullcover.out -coverpkg=./... ./...
+    - cat fullcover.out | grep -v ".pb.go" | grep -v "cmd/" > cover.out
+    - go tool cover -func=cover.out
+    - CGO_ENABLED=0 GOOS=linux go build -o $CI_PROJECT_NAME "./cmd/${CI_PROJECT_NAME}/main.go"
+  artifacts:
+    expire_in: 10 minutes
+    paths:
+      - ./$CI_PROJECT_NAME
